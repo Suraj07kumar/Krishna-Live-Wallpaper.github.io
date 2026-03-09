@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Krishna — Divine Gaze | Live Wallpaper</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #f0d080;
+      --gold-dim: #7a6030;
+      --deep: #0a0608;
+      --lotus: #8b3a5a;
+      --sky: #1a2a4a;
+      --cream: #f5e6c8;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--deep);
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Particle canvas ── */
+    #particles {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      padding: 40px 20px 20px;
+    }
+
+    /* top Sanskrit */
+    .sanskrit {
+      font-size: clamp(12px, 2vw, 16px);
+      letter-spacing: 0.4em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      animation: fadeDown 1.2s ease both;
+    }
+
+    /* main title */
+    .title {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(28px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      text-align: center;
+      background: linear-gradient(135deg, #f0d080 0%, #c9a84c 40%, #f5e6c8 70%, #c9a84c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(201,168,76,0.5));
+      animation: fadeDown 1.4s ease both 0.1s;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: clamp(13px, 2.2vw, 19px);
+      font-style: italic;
+      color: rgba(245,230,200,0.55);
+      letter-spacing: 0.2em;
+      text-align: center;
+      animation: fadeDown 1.4s ease both 0.2s;
+      margin-bottom: 40px;
+    }
+
+    /* ── Video frame ── */
+    .video-wrapper {
+      position: relative;
+      width: min(800px, 92vw);
+      border-radius: 4px;
+      animation: fadeUp 1.6s ease both 0.3s;
+    }
+
+    /* ornate corner borders */
+    .video-wrapper::before,
+    .video-wrapper::after {
+      content: '';
+      position: absolute;
+      width: 60px; height: 60px;
+      border-color: var(--gold);
+      border-style: solid;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .video-wrapper::before {
+      top: -6px; left: -6px;
+      border-width: 2px 0 0 2px;
+    }
+    .video-wrapper::after {
+      bottom: -6px; right: -6px;
+      border-width: 0 2px 2px 0;
+    }
+
+    .corner-tr, .corner-bl {
+      position: absolute;
+      width: 60px; height: 60px;
+      border-color: var(--gold);
+      border-style: solid;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .corner-tr { top: -6px; right: -6px; border-width: 2px 2px 0 0; }
+    .corner-bl { bottom: -6px; left: -6px; border-width: 0 0 2px 2px; }
+
+    /* glow ring */
+    .video-glow {
+      position: absolute;
+      inset: -20px;
+      border-radius: 8px;
+      background: radial-gradient(ellipse at center, rgba(201,168,76,0.18) 0%, transparent 70%);
+      z-index: 0;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    video {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      border-radius: 4px;
+      display: block;
+      box-shadow: 0 0 60px rgba(201,168,76,0.25), 0 30px 80px rgba(0,0,0,0.8);
+    }
+
+    /* ── Download button ── */
+    .btn-wrap {
+      margin-top: 44px;
+      animation: fadeUp 1.8s ease both 0.5s;
+      position: relative;
+      z-index: 10;
+    }
+
+    .download-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 48px;
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(11px, 1.8vw, 15px);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--deep);
+      background: linear-gradient(135deg, #f0d080, #c9a84c, #a8892a);
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 24px rgba(201,168,76,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .download-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 40px rgba(201,168,76,0.65), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .download-btn:hover::before { opacity: 1; }
+    .download-btn:active { transform: translateY(0) scale(0.99); }
+
+    .btn-icon {
+      width: 22px; height: 22px;
+      flex-shrink: 0;
+      animation: bobDown 2s ease-in-out infinite;
+    }
+
+    /* ── Info strip ── */
+    .info-strip {
+      display: flex;
+      gap: clamp(20px, 5vw, 60px);
+      margin-top: 48px;
+      animation: fadeUp 2s ease both 0.7s;
+    }
+
+    .info-item {
+      text-align: center;
+    }
+
+    .info-val {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: clamp(14px, 2vw, 20px);
+      color: var(--gold);
+      display: block;
+    }
+
+    .info-label {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(245,230,200,0.4);
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* ── Divider ornament ── */
+    .ornament {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 60px auto 0;
+      width: min(600px, 80vw);
+      animation: fadeUp 2s ease both 0.8s;
+    }
+
+    .ornament-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    }
+
+    .ornament-symbol {
+      font-size: 24px;
+      color: var(--gold);
+      filter: drop-shadow(0 0 8px rgba(201,168,76,0.6));
+    }
+
+    /* ── Footer quote ── */
+    .quote {
+      font-style: italic;
+      font-size: clamp(13px, 1.8vw, 17px);
+      color: rgba(245,230,200,0.45);
+      text-align: center;
+      max-width: 500px;
+      margin: 20px auto 0;
+      line-height: 1.8;
+      animation: fadeUp 2.2s ease both 0.9s;
+      padding-bottom: 50px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50%       { opacity: 1;   transform: scale(1.04); }
+    }
+    @keyframes bobDown {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(4px); }
+    }
+
+    /* ── Responsive tweaks ── */
+    @media (max-width: 500px) {
+      .info-strip { gap: 24px; }
+      .download-btn { padding: 15px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<section class="hero">
+  <p class="sanskrit">ॐ नमो भगवते वासुदेवाय</p>
+  <h1 class="title">Krishna</h1>
+  <p class="subtitle">Divine Gaze &nbsp;·&nbsp; Live Wallpaper &nbsp;·&nbsp; 4K</p>
+
+  <div class="video-wrapper">
+    <div class="video-glow"></div>
+    <div class="corner-tr"></div>
+    <div class="corner-bl"></div>
+    <video autoplay muted loop playsinline>
+      <source src="KRISHNA_Divine_Gaze_Live_Wallpaper_4K_2160P.webm" type="video/webm"/>
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <div class="btn-wrap">
+    <a class="download-btn" href="KRISHNA_Divine_Gaze_Live_Wallpaper_4K_2160P.webm" download="Krishna_Divine_Gaze_4K.webm">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v13M7 11l5 5 5-5"/>
+        <path d="M4 20h16"/>
+      </svg>
+      Download Wallpaper
+    </a>
+  </div>
+
+  <div class="info-strip">
+    <div class="info-item">
+      <span class="info-val">4K</span>
+      <span class="info-label">Resolution</span>
+    </div>
+    <div class="info-item">
+      <span class="info-val">2160p</span>
+      <span class="info-label">Ultra HD</span>
+    </div>
+    <div class="info-item">
+      <span class="info-val">WebM</span>
+      <span class="info-label">Format</span>
+    </div>
+    <div class="info-item">
+      <span class="info-val">Live</span>
+      <span class="info-label">Wallpaper</span>
+    </div>
+  </div>
+
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <span class="ornament-symbol">❋</span>
+    <div class="ornament-line"></div>
+  </div>
+
+  <p class="quote">
+    "Whenever righteousness wanes and unrighteousness increases,<br/>
+    I manifest myself on earth."<br/>
+    <em style="color:var(--gold-dim); font-size:0.85em;">— Bhagavad Gita 4.7</em>
+  </p>
+</section>
+
+<script>
+  // ── Floating gold particle system ──
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function createParticle() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H + H,
+      r: Math.random() * 1.8 + 0.4,
+      speed: Math.random() * 0.5 + 0.2,
+      alpha: Math.random() * 0.6 + 0.1,
+      drift: (Math.random() - 0.5) * 0.4,
+    };
+  }
+
+  function initParticles() {
+    particles = Array.from({ length: 120 }, createParticle);
+    particles.forEach(p => { p.y = Math.random() * H; });
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,168,76,${p.alpha})`;
+      ctx.fill();
+
+      p.y -= p.speed;
+      p.x += p.drift;
+
+      if (p.y < -10) {
+        Object.assign(p, createParticle());
+        p.y = H + 10;
+      }
+    });
+    requestAnimationFrame(drawParticles);
+  }
+
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+  resize();
+  initParticles();
+  drawParticles();
+</script>
+</body>
+</html>
